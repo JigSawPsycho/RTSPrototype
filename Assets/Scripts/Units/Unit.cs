@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-
 /// <summary>
 /// Base class for all units used in the game, bot player and bot controlled.
 /// </summary>
@@ -11,21 +8,37 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class Unit : MonoBehaviour
 {
-    int health;
-    NavMeshAgent agent;
-    public static event Action<Unit, bool> Selected = delegate { };
-
-    //
-    public Vector3 targetPos;
-    float yOffset;
-    [SerializeField] float tAreaTime;
-    public float distanceBuffer;
-    public UnitController unitControl;
-    //
+    public static event Action<Unit, bool> OnSelect;
 
     Renderer rend;
+
     private bool isCulled;
+
+    Vector3 targetPos;
+
+    float _yOffset;
+
     [SerializeField] bool visibleLastFrame = false;
+
+    [SerializeField] 
+    float tAreaTime;
+
+    [SerializeField]
+    float distanceBuffer;
+
+    [SerializeField]
+    float _buildTime;
+    /// <summary>
+    /// Time required for this unit to be built by an unit producing building
+    /// </summary>
+    public float BuildTime { get { return _buildTime; } private set { _buildTime = value; } }
+
+    public UnitController unitControl;
+
+    int health;
+    /// <summary>
+    /// Current health of this unit
+    /// </summary>
     int Health
     {
         get { return health; }
@@ -40,6 +53,7 @@ public class Unit : MonoBehaviour
         get { return this.gameObject.transform.position; }
     }
 
+    NavMeshAgent agent;
     public NavMeshAgent GetAgent
     {
         get { return agent; }
@@ -50,7 +64,7 @@ public class Unit : MonoBehaviour
         gameObject.layer = 8;
         agent = GetComponent<NavMeshAgent>();
         rend = GetComponent<Renderer>();
-        yOffset = gameObject.transform.localScale.y;
+        _yOffset = gameObject.transform.localScale.y;
         targetPos = gameObject.transform.position;
         tAreaTime = 0f;
     }
@@ -60,7 +74,7 @@ public class Unit : MonoBehaviour
     /// </summary>
     protected void Update()
     {
-        targetPos = GetAgent.destination + new Vector3(0, yOffset, 0);
+        targetPos = GetAgent.destination + new Vector3(0, _yOffset, 0);
         if (targetPos != gameObject.transform.position)
         {
             if (Vector3.Distance(gameObject.transform.position, targetPos) < distanceBuffer)
@@ -99,47 +113,7 @@ public class Unit : MonoBehaviour
 
     public void Select(bool selectingSingle)
     {
-        Selected(this, selectingSingle);
+        OnSelect?.Invoke(this, selectingSingle);
     }
 
-}
-
-class Building
-{
-    public int Health
-    {
-        get;
-        set;
-    }
-
-    public Vector3 GetPos
-    {
-        get;
-        set;
-    }
-}
-
-class UnitBuilder
-{
-    public Vector3 RallyPos
-    {
-        get;
-        set;
-    }
-
-    public List<Unit> ProductionQueue
-    { 
-        get;
-        set;
-    }
-
-    public void QueueBuildUnit(Unit unitToQueue)
-    {
-        ProductionQueue.Add(unitToQueue);
-    }
-
-    public void UnqueueBuildUnit(Unit unitToDequeue)
-    {
-        ProductionQueue.Remove(unitToDequeue);
-    }
 }

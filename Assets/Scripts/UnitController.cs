@@ -26,10 +26,6 @@ public class UnitController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKey(KeyCode.Space))
-        {
-            BuildUnit();
-        }
         if(Input.GetMouseButtonDown(1))
         {
             MoveUnits();
@@ -54,13 +50,5 @@ public class UnitController : MonoBehaviour
                 }
             }
         }
-    }
-
-    void BuildUnit()
-    {
-        Unit unit = Instantiate(unitPrefab, spawnPos, Quaternion.identity).GetComponent<Unit>();
-        unit.unitControl = this;
-        UnitSelector.units.Add(unit);
-        Debug.Log(unit.gameObject);
     }
 }

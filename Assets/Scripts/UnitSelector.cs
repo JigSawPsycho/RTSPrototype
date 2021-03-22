@@ -42,7 +42,7 @@ public class UnitSelector : MonoBehaviour
         onScreenUnits = new List<Unit>();
         
         terrainLayerMask = LayerMask.GetMask("Terrain");
-        Unit.Selected += Unit_Selected;
+        Unit.OnSelect += Unit_Selected;
         VisibilityChange.ChangedVisibility += Unit_VisibilityChanged;
     }
 
